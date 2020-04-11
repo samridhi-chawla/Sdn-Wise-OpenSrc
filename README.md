@@ -26,6 +26,8 @@ In order to run the sdn-wise in cooja simulation
 	- ant run
 
 3. create a simulation with a network of sdn-wise sensor nodes and sink.
+Either new->open simulation->coojaexamlessdnwisejava1.csc given in the directory
+OR
 	- new->new simulation
 	- motes-> add motes->import java motes
 	- add one sink node from - contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/Sink.class
