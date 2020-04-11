@@ -35,10 +35,10 @@ In order to run the sdn-wise in cooja simulation
 In order to edit the code for controller or the sensor nodes
 1. Edit the Controller at controller/01Getstarted/java	
 2. It is a maven project. (Make sure you have mvn 3.0.3 only and not higher versions)
-	Command to build maven project:[the controller 01Getstarted, it will have pom.xml in it]
-	Mvn clean package – to clean the package
-	Mvn package – to build the jar file snapshot…jar
-	Mvn clean install – to build and run the package
+	- Command to build maven project:[the controller 01Getstarted, it will have pom.xml in it]
+	- Mvn clean package – to clean the package
+	- Mvn package – to build the jar file snapshot…jar
+	- Mvn clean install – to build and run the package
 
 3. run controller again using
 java -jar target/01-GetStarted.jar	
