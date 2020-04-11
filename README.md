@@ -11,7 +11,7 @@ The compiled java class code for the sensor nodes is in placed in contiki/tools/
 
 This code is used in InstantContiki OS and run in cooja simulation. 
 
-In order to run the sdn-wise in cooja simulation
+##In order to run the sdn-wise in cooja simulation
 1. run the controller
 	- open terminal
 	- cd into the controller directory
@@ -32,7 +32,7 @@ In order to run the sdn-wise in cooja simulation
 	- add multiple sensor nodes from - contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/Mote.class
 	
 	
-In order to edit the code for controller or the sensor nodes
+##In order to edit the code for controller or the sensor nodes
 1. Edit the Controller at controller/01Getstarted/java	
 2. It is a maven project. (Make sure you have mvn 3.0.3 only and not higher versions)
 	- Command to build maven project:[the controller 01Getstarted, it will have pom.xml in it]
@@ -48,6 +48,6 @@ java -jar target/01-GetStarted.jar
 In order to edit the code for sdnwise sensor nodes
 1. Edit the code at contiki/tools/cooja/examples/sdn-wise_java/java/com/github/sdnwiselab/sdnwise/cooja/
 2. sdn-wise_java is a java ant project. Commands
-Ant clean = to delete the built folders and
-Ant -f build.xml= command to build the project
+	- Ant clean = to delete the built folders and
+	- Ant -f build.xml= command to build the project
 
