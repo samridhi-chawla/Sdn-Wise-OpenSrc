@@ -1,2 +1,2 @@
-# Sdn-Wise-OpenSrc
-Enhanced SDNWISE open source project and performed analysis of SDN in wireless sensor networks.
+# This code is cloned from sdnwiselab repository and enhanced to perform analaysis of SDN in wireless sensor networks
+
