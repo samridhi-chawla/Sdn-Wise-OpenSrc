@@ -7,7 +7,7 @@ It is a java code compiled with maven 3.0.3.
 
 The data plane here consists of wireless sensor network (WSN). A WSN is a network of sensor nodes. 
 One of the sensor nodes works as a sink node and is directly connected to the controller.
-The compiled java class code for the sensor nodes is in placed in contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/ as Sink.java and Mote.java.
+The compiled java class code for the sensor nodes is in placed in contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/ as Sink.java , Mote.java and Mote$Src.java.
 
 This code is used in InstantContiki OS and run in cooja simulation. 
 
@@ -31,7 +31,7 @@ OR
 	- new->new simulation
 	- motes-> add motes->import java motes
 	- add one sink node from - contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/Sink.class
-	- add multiple sensor nodes from - contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/Mote.class
+	- add multiple sensor nodes from - contiki/tools/cooja/examples/sdn-wise_java/build/com/github/sdnwiselab/sdnwise/cooja/Mote$Src.class
 	
 	
 ##In order to edit the code for controller or the sensor nodes
@@ -53,3 +53,7 @@ In order to edit the code for sdnwise sensor nodes
 	- Ant clean = to delete the built folders and
 	- Ant -f build.xml= command to build the project
 
+In this code the data is being tranfered in between the motes for the analzing the flows in the sdn-wise rather than between the motes and the sink.
+#A maximum of 8 sources and 8 destinations can be created and the data can be transferred between them.
+#For varying the sources the execute function in contiki/tools/cooja/examples/sdn-wise_java/java/com/github/sdnwiselab/sdnwise/cooja/Mote$Src.java has to be modified.
+#Similarly for varying the destinations the getActualDestAddress() function in contiki/tools/cooja/examples/sdn-wise_java/java/com/github/sdnwiselab/sdnwise/cooja/Mote$Src.java has to be modified.
