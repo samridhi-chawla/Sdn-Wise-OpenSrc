@@ -104,20 +104,9 @@ public class Mote extends AbstractMote {
 
     @Override
     public final void controllerTX(NetworkPacket pck) {
+    	if(pck.getType() == 2 || pck.getType() == 128 || pck.getType() == 133)
         pck.setNxhop(getNextHopVsSink());
-if(pck.getType()==2){
-            ReportPacket rp = new ReportPacket(pck);
-        // sam added
-        for (int j = 0; j < neighbors_number; j++) {
-            rp.setNeighbourAddressAt(neighborTable.get(j).getAddr(), j)
-                    .setNeighbourWeightAt((byte) neighborTable.get(j).getRssi(), j);
-        }
-radioTX(rp);
-//log("reached setneighbors");
-        }
-else{
         radioTX(pck);
-    }
 }
 
     @Override

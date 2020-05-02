@@ -44,6 +44,7 @@ import static com.github.sdnwiselab.sdnwise.packet.ConfigRulePacket.*;
 import static com.github.sdnwiselab.sdnwise.packet.ConfigTimerPacket.*;
 import static com.github.sdnwiselab.sdnwise.packet.NetworkPacket.*;
 import com.github.sdnwiselab.sdnwise.util.*;
+import java.text.DecimalFormat;                            //Nikhil Added
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -51,8 +52,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.*;
 import org.contikios.cooja.*;
 import org.contikios.cooja.interfaces.*;
-import org.contikios.cooja.motes.AbstractApplicationMote;
 import java.nio.charset.Charset;
+import org.contikios.cooja.motes.AbstractApplicationMote;
 
 /**
  * Example SdnWise mote.
@@ -61,7 +62,7 @@ import java.nio.charset.Charset;
  *
  * @author Sebastiano Milardo
  */
-public abstract class AbstractMote extends AbstractApplicationMote {
+public abstract class AbstractMote$src extends AbstractApplicationMote {
 
     public ArrayList<Integer> statusRegister = new ArrayList<>();
 
@@ -79,10 +80,10 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     private int cntBeacon = 0;
     private int cntReport = 0;
     private int cntUpdTable = 0;
-//sam
+    //sam
     private int cntData = 0;
     private int data_iteration = 0; //sam
-
+    
     ApplicationRadio radio = null;
     ApplicationLED leds = null;
 
@@ -114,13 +115,12 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     HashMap<Integer, FunctionInterface> functions = new HashMap<>();
     Logger MeasureLOGGER;
 
-    public AbstractMote() {
+    public AbstractMote$src() {
         super();
     }
 
-    public AbstractMote(MoteType moteType, Simulation simulation) {
+    public AbstractMote$src(MoteType moteType, Simulation simulation) {
         super(moteType, simulation);
-
     }
 
     @Override
@@ -130,14 +130,17 @@ public abstract class AbstractMote extends AbstractApplicationMote {
             setup();
         }
 
-        int delay = random.nextInt(10);
+        int delay = random.nextInt(45);
 
         simulation.scheduleEvent(
                 new MoteTimeEvent(this, 0) {
                     @Override
                     public void execute(long t) {
                         timerTask();
-            			timerTask_data();
+			if(addr.toString().equals("0.2") || addr.toString().equals("0.3") || addr.toString().equals("0.4")
+                                      ||addr.toString().equals("0.5") || addr.toString().equals("0.6") || addr.toString().equals("0.7")
+                                      || addr.toString().equals("0.8") || addr.toString().equals("0.9"))  //Nikhil Added
+			timerTask_data();
                         logTask();
                     }
                 },
@@ -150,20 +153,19 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     public void receivedPacket(RadioPacket p) {
         byte[] packetData = p.getPacketData();
         NetworkPacket np = new NetworkPacket(packetData);
-         log("abstractMote received packet src "+np.getSrc()+" dest "+np.getDst()+" type: "+np.getType());
-         if(np.getType() == SDN_WISE_DATA && np.getDst()==addr){
+        log("abstractMote received packet src "+np.getSrc()+" dest "+np.getDst()+" type: "+np.getType());
+        
+        if(np.getType() == SDN_WISE_DATA && np.getDst()==addr){
             DataPacket dp = new DataPacket(np);
-            log(dp.getPayload().toString());
+            //Nikhil Changed
+            log(new String(dp.getPayload().toString()));
         }
-        else if(np.getType() == SDN_WISE_DATA && np.getDst()!=addr){
-            runFlowMatch(np);
-        }
-        if(np.getType() == 128)
+        if(np.getType() == 128)       //Nikhil Added
         controllerTX(np);
         else if (np.getDst().isBroadcast()
                 || np.getNxhop().equals(addr)
-                || acceptedId.contains(np.getNxhop())//Nikhil Changed
-                || np.getDst() == addr) {
+                || acceptedId.contains(np.getNxhop())
+                || np.getDst()==addr) {
             rxHandler(new NetworkPacket(packetData), 255);
         }
     }
@@ -198,7 +200,7 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     }
 
     public void initSdnWise() {
-//sam added random delay for beacon and report to improve prr
+
         cnt_beacon_max = SDN_WISE_DFLT_CNT_BEACON_MAX +random.nextInt(10);
         cnt_report_max = SDN_WISE_DFLT_CNT_REPORT_MAX +random.nextInt(10);
         cnt_updtable_max = SDN_WISE_DFLT_CNT_UPDTABLE_MAX +random.nextInt(10);
@@ -208,8 +210,9 @@ public abstract class AbstractMote extends AbstractApplicationMote {
         battery = new Battery();
         flow_table_free_pos = 1;
         accepted_id_free_pos = 0;
- //sam
-        cnt_data_max = 235 +random.nextInt(10); //3 mins 55 sec +- 10 seconds
+        
+        //sam
+        cnt_data_max = 240+random.nextInt(10); //4 mins
     }
 
     public final void radioTX(final NetworkPacket np) {
@@ -217,7 +220,8 @@ public abstract class AbstractMote extends AbstractApplicationMote {
         if (np.getType() > 7 && !np.isRequest()) {
             sentDataBytes += np.getPayloadSize();
         }
-  //log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" dest= "+np.getDst()+" typ= "+np.getType()+" ttl= "+np.getTtl()+" is_request "+np.isRequest()+" nxt_hop "+np.getNxhop());
+       // log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" dest= "+np.getDst()+" typ= "+np.getType()+" ttl= "+np.getTtl()+" is_request "+np.isRequest()+" nxt_hop "+np.getNxhop());
+
         battery.transmitRadio(np.getLen());
         np.decrementTtl();
         RadioPacket pk = new COOJARadioPacket(np.toByteArray());
@@ -233,7 +237,7 @@ public abstract class AbstractMote extends AbstractApplicationMote {
                             + 1 * Simulation.MILLISECOND
             );
         } else {
-            int delay = random.nextInt(10);
+            int delay = random.nextInt(27);
             radio.startTransmittingPacket(pk, delay * Simulation.MILLISECOND);
         }
     }
@@ -241,18 +245,20 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     public final NodeAddress getNextHopVsSink() {
         return ((AbstractForwardAction) (flowTable.get(0).getActions().get(0))).getNextHop();
     }
+     
 
-    public final void rxData(DataPacket packet) {
-        if (isAcceptedIdPacket(packet)) {
-// log if the destination of the data packet is 'addr'
-	    log("Rec data: "+(new String(packet.getPayload(),Charset.forName("UTF-8"))));
-            //log("Rec data: "+packet.getPayload().toString().getBytes() + " from: "+ packet.getSrc().getLow()+" dest: "+packet.getDst().getLow());
-            SDN_WISE_Callback(packet);
-        } else if (isAcceptedIdAddress(packet.getNxhop())) {
-            runFlowMatch(packet);
-        }
+    public final void rxData(DataPacket packet) 
+    {
+     if(packet.getDst().equals(addr))
+     log("Rec data: "+(new String(packet.getPayload(),Charset.forName("UTF-8")))+" type: "+packet.getType());
+     else if(packet.getDst().isBroadcast())
+     {
+      log("Rec data: "+(new String(packet.getPayload(),Charset.forName("UTF-8"))));
+      SDN_WISE_Callback(packet);
+      }
+      else
+      runFlowMatch(packet);
     }
-
     public void rxBeacon(BeaconPacket bp, int rssi) {
         int index = getNeighborIndex(bp.getSrc());
 
@@ -286,8 +292,8 @@ public abstract class AbstractMote extends AbstractApplicationMote {
         }
         if (found == 0) { //!found
             // It's necessary to send a rule/request if we have done the lookup
-            // I must modify the source address with myself,
-            packet.setSrc(addr)
+            // I must modify the source address with myself
+           packet.setSrc(addr)
                     .setRequestFlag()
                     .setTtl(SDN_WISE_DFLT_TTL_MAX);
             controllerTX(packet);
@@ -298,6 +304,29 @@ public abstract class AbstractMote extends AbstractApplicationMote {
 
     public NodeAddress getActualSinkAddress() {
         return new NodeAddress(flowTable.get(0).getWindows().get(0).getRhs());
+    }
+    
+    // Nikhil added
+    public NodeAddress getActualDestAddress()
+    {
+     DecimalFormat df=new DecimalFormat("0.##");
+     double d=Double.parseDouble(addr.toString());
+     String str=df.format(d);
+     if(str.equals("0.1"))
+     str="0.10";
+     if(str.length()==3)
+     d=Double.parseDouble(str)+0.8;
+     else
+     d=Double.parseDouble(str)+0.08;
+     if(d>=1)
+     {
+     d=d/10.0000000;
+     df=new DecimalFormat("0.##");
+     }
+     str=df.format(d);
+     if(str.equals("0.1"))
+     str="0.10";
+     return new NodeAddress(str);
     }
 
     public abstract void SDN_WISE_Callback(DataPacket packet);
@@ -462,8 +491,7 @@ public abstract class AbstractMote extends AbstractApplicationMote {
         }
         return toBeSent;
     }
-    
-  private void timerTask_data(){
+    private void timerTask_data(){
     
     if (semaphore == 1 && battery.getBatteryLevel() > 0) {
             battery.keepAlive(1);
@@ -472,22 +500,21 @@ public abstract class AbstractMote extends AbstractApplicationMote {
             if((cntData) >= cnt_data_max){
                 cntData = 0 ;
                 data_iteration ++;
-		String msg = "Hello "+data_iteration+ " from node "+ addr.getLow() + " No. of hops "+getDistanceFromSink();
+                String msg = "Hello Nikhil data iter: "+data_iteration+ " from node: "+ addr.getLow()+" to node: "+getActualDestAddress().getLow();
                 controllerTX(prepareSamData(msg));
             }
         }
         requestImmediateWakeup();
     }
-
     private void timerTask() {
-        //int data_iteration = 0; //sam
+        
         if (semaphore == 1 && battery.getBatteryLevel() > 0) {
             battery.keepAlive(1);
 
             cntBeacon++;
             cntReport++;
             cntUpdTable++;
-	        cntData += 2; //sam
+            cntData += 2; //Nikhil Added
 
             if ((cntBeacon) >= cnt_beacon_max) {
                 cntBeacon = 0;
@@ -496,20 +523,14 @@ public abstract class AbstractMote extends AbstractApplicationMote {
 
             if ((cntReport) >= cnt_report_max) {
                 cntReport = 0;
-                controllerTX(prepareReport());
+               controllerTX(prepareReport());
             }
 
             if ((cntUpdTable) >= cnt_updtable_max) {
                 cntUpdTable = 0;
                 updateTable();
             }
-//sam
-            //if((cntData) >= cnt_data_max){
-              //  cntData = 0 ;
-              //  data_iteration ++;
-               // String msg = "Hello "+data_iteration+ "from node"+ addr.getLow();
-               // controllerTX(prepareSamData(msg));
-            //}
+            
         }
         requestImmediateWakeup();
     }
@@ -560,7 +581,7 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     }
 
     private void rxOpenPath(OpenPathPacket opp) {
-        if (isAcceptedIdPacket(opp)) {
+       if (opp.getDst().equals(addr) || opp.getDst().isBroadcast()) {
             List<NodeAddress> path = opp.getPath();
             for (int i = 0; i < path.size(); i++) {
                 NodeAddress actual = path.get(i);
@@ -608,6 +629,12 @@ public abstract class AbstractMote extends AbstractApplicationMote {
                 }
             }
         } else {
+            if(NeighborPacket(opp.getDst()))
+            {
+             opp.setNxhop(opp.getDst());
+             controllerTX(opp);
+            }
+            else
             runFlowMatch(opp);
         }
     }
@@ -658,8 +685,8 @@ public abstract class AbstractMote extends AbstractApplicationMote {
         if (packet.getLen() > SDN_WISE_DFLT_HDR_LEN
                 && packet.getNetId() == net_id
                 && packet.getTtl() != 0) {
-           // log("[INFO-RX] at rxHandler len= "+packet.getLen()+" net= "+packet.getNetId()+" src: " +packet.getSrc().getLow()+" dest= "+packet.getDst()+" typ= "+packet.getType()+" ttl= "+packet.getTtl() +" is_request "+packet.isRequest());
-            if (packet.isRequest()) {
+         //   log("[INFO-RX] at rxHandler len= "+packet.getLen()+" net= "+packet.getNetId()+" src: " +packet.getSrc().getLow()+" dest= "+packet.getDst()+" typ= "+packet.getType()+" ttl= "+packet.getTtl() +" is_request "+packet.isRequest());
+                if (packet.isRequest()) {
                 controllerTX(packet);
             } else {
                 switch (packet.getType()) {
@@ -711,8 +738,8 @@ public abstract class AbstractMote extends AbstractApplicationMote {
 
     private void initAcceptedId() {
         for (int i = 0; i < SDN_WISE_ACCEPTED_ID_MAX; i++) {
-            acceptedId.add(i, new NodeAddress(65535));
-
+            //acceptedId.add(i, new NodeAddress(65535));
+            acceptedId.add(i, new NodeAddress(i));
         }
     }
 
@@ -744,16 +771,15 @@ public abstract class AbstractMote extends AbstractApplicationMote {
 
         initFlowTable();
         initNeighborTable();
-
         initAcceptedId();
         initStatusRegister();
         initSdnWise();
 
         new Thread(new PacketManager()).start();
         new Thread(new PacketSender()).start();
-	//new Thread(new samPrint()).start();
+        new Thread(new samPrint()).start();
     }
-private class samPrint implements Runnable{
+    private class samPrint implements Runnable{
 
         @Override
         public void run() {
@@ -800,6 +826,10 @@ log(printFlow);
         }
         
     }
+
+    
+
+
     private int getOperand(NetworkPacket packet, int size, int location, int value) {
         int[] intPacket = packet.toIntArray();
         switch (location) {
@@ -1002,12 +1032,12 @@ log(printFlow);
 // sam
     DataPacket prepareSamData(String msg1){
         String msg = msg1;
-        //DataPacket dp = new DataPacket(net_id, addr, getActualSinkAddress(), msg.getBytes());
-        //log("prepared data packet "+dp.getData()+dp.getSrc()+dp.getDst());
-        //return dp;
-	DataPacket dp = new DataPacket(net_id, addr, getActualSinkAddress());
+        //this declaration says max 3 variables allowed as arguments. and there us no function as getData()
+        //DataPacket dp = new DataPacket(net_id, addr, getActualDestAddress(), msg.getBytes());
+        DataPacket dp = new DataPacket(net_id, addr, getActualDestAddress());
         dp.setPayload(msg.getBytes());
-        log("prepared data packet "+(new String(dp.getPayload(),Charset.forName("UTF-8")))+" src: "+dp.getSrc().getLow()+" dest: "+dp.getDst().getLow());
+        log("prepared data packet "+(new String(dp.getPayload(),Charset.forName("UTF-8")))+" Source: "+dp.getSrc()+" Dest: "+dp.getDst()
+            +" type: "+dp.getType());
         return dp;
     }
     ReportPacket prepareReport() {
@@ -1021,13 +1051,12 @@ log(printFlow);
 
         rp.setNeigh(neighbors_number)
                 .setNxhop(getNextHopVsSink());
-
         for (int j = 0; j < neighbors_number; j++) {
             rp.setNeighbourAddressAt(neighborTable.get(j).getAddr(), j)
                     .setNeighbourWeightAt((byte) neighborTable.get(j).getRssi(), j);
         }
-//sam edited - no need - illogical
-        //initNeighborTable();
+        //sam cut this- illogical
+        // initNeighborTable();
         return rp;
     }
 
@@ -1123,7 +1152,7 @@ log(printFlow);
                     battery.receiveRadio(tmpPacket.getLen());
                     receivedBytes += tmpPacket.getLen();
                     rxHandler(tmpPacket, 255);
-log("PacketManager sent packet to rxhandler scr:"+tmpPacket.getSrc()+"dest:"+tmpPacket.getDst()+"type="+tmpPacket.getType());
+                    log("PacketManger sent packet to rxhandler scr: "+tmpPacket.getSrc()+" dest: "+tmpPacket.getDst()+" type: "+tmpPacket.getType());
                 }
             } catch (InterruptedException ex) {
                 log(ex.getLocalizedMessage());
@@ -1146,3 +1175,4 @@ log("PacketManager sent packet to rxhandler scr:"+tmpPacket.getSrc()+"dest:"+tmp
         }
     }
 }
+

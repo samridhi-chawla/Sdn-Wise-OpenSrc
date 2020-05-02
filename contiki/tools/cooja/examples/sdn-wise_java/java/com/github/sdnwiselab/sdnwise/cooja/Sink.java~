@@ -81,6 +81,8 @@ public class Sink extends AbstractMote {
     public final void controllerTX(NetworkPacket pck) {
         try {
             if (tcpSocket != null) {
+                if(pck.getType()==128)
+                System.out.println("\n Packet Sent to Controller type: "+pck.getType()+" Source: "+pck.getSrc()+" Dest: "+pck.getDst());
                 inviaOBJ = new DataOutputStream(tcpSocket.getOutputStream());
                 inviaOBJ.write(pck.toByteArray());
                 log("TX-C up" + pck);
