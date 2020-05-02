@@ -104,7 +104,7 @@ public abstract class Controller implements Observer, Runnable, ControllerInterf
     }
 
     public void managePacket(NetworkPacket data) {
-	System.out.println("len="+data.getLen()+" net="+data.getNetId()+"  src:"+data.getSrc()+", dest="+data.getDst()+", typ="+data.getType());
+	System.out.println(" len="+data.getLen()+" net="+data.getNetId()+"  src:"+data.getSrc()+", dest="+data.getDst()+", typ="+data.getType());
         switch (data.getType()) {
 
             case SDN_WISE_REPORT:

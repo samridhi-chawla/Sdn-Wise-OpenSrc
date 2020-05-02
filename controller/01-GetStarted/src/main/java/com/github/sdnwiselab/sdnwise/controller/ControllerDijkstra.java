@@ -58,7 +58,7 @@ public class ControllerDijkstra extends Controller {
 
     @Override
     public final void manageRoutingRequest(NetworkPacket data) {
-System.out.println("type 128 = isRequest=true");
+
         String destination = data.getNetId() + "." + data.getDst();
         String source = data.getNetId() + "." + data.getSrc();
 
@@ -79,13 +79,14 @@ System.out.println("type 128 = isRequest=true");
                     lastModification = networkGraph.getLastModification();
                 } else {
                     path = results.get(data.getDst());
+                    System.out.println(" [Path]:" + path);                      //Nikhil Added
                 }
                 if (path == null) {
                     path = new LinkedList<>();
                     for (Node node : dijkstra.getPathNodes(networkGraph.getNode(destination))) {
                         path.push((NodeAddress) node.getAttribute("nodeAddress"));
                     }
-                    System.out.println("[CTRL]: " + path);
+                    System.out.println(" [CTRL]: " + path);
                     results.put(data.getDst(), path);
                 }
                 if (path.size() > 1) {

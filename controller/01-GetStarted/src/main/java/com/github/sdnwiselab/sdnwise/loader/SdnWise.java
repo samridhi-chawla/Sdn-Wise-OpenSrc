@@ -93,7 +93,7 @@ public class SdnWise {
         
             // Then we query the nodes
             while (true){    
-               /* for (int i = 1; i <= 5; i++){
+                for (int i = 1; i < 12; i++){
                     System.out.println("- quering node " + i);
                     int netId = 1;
                     NodeAddress dst = new NodeAddress(i);
@@ -101,13 +101,10 @@ public class SdnWise {
                     
                     DataPacket p = new DataPacket(netId,src,dst);
                     p.setNxhop(src);
-                    p.setPayload("Hello World sam!".getBytes(Charset.forName("UTF-8")));
+                    p.setPayload("Hello World!".getBytes(Charset.forName("UTF-8")));
                     controller.sendNetworkPacket(p);
-Logger.getLogger(SdnWise.class.getName()).log(Level.INFO,"sent DP to id: "+i+"dst add:"+dst.toString());
                     Thread.sleep(2000);
-
                 }
-*/
             }
         
         } catch (InterruptedException ex) {

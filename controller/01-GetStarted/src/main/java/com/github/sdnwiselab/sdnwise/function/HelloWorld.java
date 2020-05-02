@@ -44,6 +44,6 @@ public class HelloWorld implements FunctionInterface {
             int arg3,
             NetworkPacket np
     ) {
-        System.out.println("Hello, World Sam!");
+        System.out.println("Hello, World!");
     }
 }

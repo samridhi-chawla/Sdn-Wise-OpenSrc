@@ -104,9 +104,9 @@ public abstract class Controller implements Observer, Runnable, ControllerInterf
     }
 
     public void managePacket(NetworkPacket data) {
-
+	System.out.println(" len="+data.getLen()+" net="+data.getNetId()+"  src:"+data.getSrc()+", dest="+data.getDst()+", typ="+data.getType());
         switch (data.getType()) {
-System.out.println("len="+data.getLen()+" net="+data.getNetId()+"  src:"+data.getSrc()+", dest="+data.getDst()+", typ="+data.getType());
+
             case SDN_WISE_REPORT:
                 networkGraph.updateMap(new ReportPacket(data));
                 break;
@@ -161,6 +161,7 @@ System.out.println("len="+data.getLen()+" net="+data.getNetId()+"  src:"+data.ge
                 cache.put(key, cp);
                 break;
             default:
+                //System.out.println("Hai");
                 if (data.isRequest()) {
                     manageRoutingRequest(data);
                 }
