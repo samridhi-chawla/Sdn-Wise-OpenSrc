@@ -79,13 +79,14 @@ public class ControllerDijkstra extends Controller {
                     lastModification = networkGraph.getLastModification();
                 } else {
                     path = results.get(data.getDst());
+                    System.out.println(" [Path]:" + path);                         //Nikhil Added
                 }
                 if (path == null) {
                     path = new LinkedList<>();
                     for (Node node : dijkstra.getPathNodes(networkGraph.getNode(destination))) {
                         path.push((NodeAddress) node.getAttribute("nodeAddress"));
                     }
-                    System.out.println("[CTRL]: " + path);
+                    System.out.println(" [CTRL]: " + path);
                     results.put(data.getDst(), path);
                 }
                 if (path.size() > 1) {

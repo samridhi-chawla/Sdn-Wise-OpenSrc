@@ -115,7 +115,6 @@ public class NetworkGraph extends Observable {
         NodeAddress addr = packet.getSrc();
 
         Node node = getNode(fullNodeId);
-
         if (node == null) {
             node = addNode(fullNodeId);
             setupNode(node, batt, now, netId, addr);
@@ -132,9 +131,8 @@ public class NetworkGraph extends Observable {
                 String edgeId = other + "-" + fullNodeId;
                 Edge edge = addEdge(edgeId, other, node.getId(), true);
                 setupEdge(edge, newLen);
-            }
+               }
             modified = true;
-
         } else {
             updateNode(node, batt, now);
             Set<Edge> oldEdges = new HashSet<>();
@@ -174,6 +172,7 @@ public class NetworkGraph extends Observable {
                 }
                 modified = true;
             }
+         
         }
 
         if (modified) {

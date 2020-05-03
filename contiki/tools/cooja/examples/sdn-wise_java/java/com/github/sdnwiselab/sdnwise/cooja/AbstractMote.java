@@ -137,7 +137,7 @@ public abstract class AbstractMote extends AbstractApplicationMote {
                     @Override
                     public void execute(long t) {
                         timerTask();
-			timerTask_data();
+            			timerTask_data();
                         logTask();
                     }
                 },
@@ -150,20 +150,22 @@ public abstract class AbstractMote extends AbstractApplicationMote {
     public void receivedPacket(RadioPacket p) {
         byte[] packetData = p.getPacketData();
         NetworkPacket np = new NetworkPacket(packetData);
-//log("received packet src "+np.getSrc()+" dest "+np.getDst()+" type: "+np.getType());
-//log("netstack conf file: "+getNetworkStack().toString());
- if(np.getType() == SDN_WISE_DATA && np.getDst()==addr){
+         log("abstractMote received packet src "+np.getSrc()+" dest "+np.getDst()+" type: "+np.getType());
+         if(np.getType() == SDN_WISE_DATA && np.getDst()==addr){
             DataPacket dp = new DataPacket(np);
             log(dp.getPayload().toString());
         }
-
-        if (np.getDst().isBroadcast()
+        else if(np.getType() == SDN_WISE_DATA && np.getDst()!=addr){
+            runFlowMatch(np);
+        }
+        if(np.getType() == 128)
+        controllerTX(np);
+        else if (np.getDst().isBroadcast()
                 || np.getNxhop().equals(addr)
-                || acceptedId.contains(np.getNxhop())) {
+                || acceptedId.contains(np.getNxhop())//Nikhil Changed
+                || np.getDst() == addr) {
             rxHandler(new NetworkPacket(packetData), 255);
         }
-log("[INFO-NXH] Next hop "+ getNextHopVsSink()+ " No of hops "+getDistanceFromSink()+ " no of neighbors "+neighbors_number);
- 
     }
 
     @Override
@@ -215,7 +217,7 @@ log("[INFO-NXH] Next hop "+ getNextHopVsSink()+ " No of hops "+getDistanceFromSi
         if (np.getType() > 7 && !np.isRequest()) {
             sentDataBytes += np.getPayloadSize();
         }
-log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" dest= "+np.getDst()+" typ= "+np.getType()+" ttl= "+np.getTtl()+" is_request "+np.isRequest()+" nxt_hop "+np.getNxhop());
+  //log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" dest= "+np.getDst()+" typ= "+np.getType()+" ttl= "+np.getTtl()+" is_request "+np.isRequest()+" nxt_hop "+np.getNxhop());
         battery.transmitRadio(np.getLen());
         np.decrementTtl();
         RadioPacket pk = new COOJARadioPacket(np.toByteArray());
@@ -231,7 +233,8 @@ log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" 
                             + 1 * Simulation.MILLISECOND
             );
         } else {
-            radio.startTransmittingPacket(pk, 1 * Simulation.MILLISECOND);
+            int delay = random.nextInt(10);
+            radio.startTransmittingPacket(pk, delay * Simulation.MILLISECOND);
         }
     }
 
@@ -484,7 +487,7 @@ log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" 
             cntBeacon++;
             cntReport++;
             cntUpdTable++;
-	    //cntData++; //sam
+	        cntData += 2; //sam
 
             if ((cntBeacon) >= cnt_beacon_max) {
                 cntBeacon = 0;
@@ -652,11 +655,10 @@ log("[INFO-TX] len= "+np.getLen()+" net= "+np.getNetId()+" src: "+np.getSrc()+" 
     }
 
     private void rxHandler(NetworkPacket packet, int rssi) {
-        
         if (packet.getLen() > SDN_WISE_DFLT_HDR_LEN
                 && packet.getNetId() == net_id
                 && packet.getTtl() != 0) {
-            log("[INFO-RX] at rxHandler len= "+packet.getLen()+" net= "+packet.getNetId()+" src: " +packet.getSrc().getLow()+" dest= "+packet.getDst()+" typ= "+packet.getType()+" ttl= "+packet.getTtl() +" is_request "+packet.isRequest());
+           // log("[INFO-RX] at rxHandler len= "+packet.getLen()+" net= "+packet.getNetId()+" src: " +packet.getSrc().getLow()+" dest= "+packet.getDst()+" typ= "+packet.getType()+" ttl= "+packet.getTtl() +" is_request "+packet.isRequest());
             if (packet.isRequest()) {
                 controllerTX(packet);
             } else {
@@ -786,7 +788,7 @@ log(printFlow);
                     controllerTX(p);
                      log("sent hi src"+p.getSrc()+" dst="+p.getDst()+" type"+p.getType());
 */
-log("[INFO-NXH] Next hop "+ getNextHopVsSink()+ " No of hops "+getDistanceFromSink()+ " no of neighbors "+neighbors_number);
+//log("[INFO-NXH] Next hop "+ getNextHopVsSink()+ " No of hops "+getDistanceFromSink()+ " no of neighbors "+neighbors_number);
                
                 
                 try {
