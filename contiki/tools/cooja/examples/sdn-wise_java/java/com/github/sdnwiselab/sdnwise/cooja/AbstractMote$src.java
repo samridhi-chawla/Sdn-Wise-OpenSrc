@@ -500,7 +500,7 @@ public abstract class AbstractMote$src extends AbstractApplicationMote {
             if((cntData) >= cnt_data_max){
                 cntData = 0 ;
                 data_iteration ++;
-                String msg = "Hello Nikhil data iter: "+data_iteration+ " from node: "+ addr.getLow()+" to node: "+getActualDestAddress().getLow();
+                String msg = "Hello World data iter: "+data_iteration+ " from node: "+ addr.getLow()+" to node: "+getActualDestAddress().getLow();
                 controllerTX(prepareSamData(msg));
             }
         }
@@ -630,12 +630,6 @@ public abstract class AbstractMote$src extends AbstractApplicationMote {
                 }
             }
         } else {
-            if(NeighborPacket(opp.getDst()))
-            {
-             opp.setNxhop(opp.getDst());
-             controllerTX(opp);
-            }
-            else
             runFlowMatch(opp);
         }
     }
